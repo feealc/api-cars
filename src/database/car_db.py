@@ -3,6 +3,7 @@ import os
 from pathlib import Path
 from gen.generic import Generic
 from model.car import Car
+from model.car_basemodel import CarPost
 
 
 class CarDb:
@@ -102,15 +103,22 @@ class CarDb:
     #     self.__commit()
     #     self.__close_conn()
 
-    def insert_car(self, new_car: Car):
+    def insert_car(self, new_car: CarPost) -> int:
+        field_names, field_binds, field_values = new_car.get_field_names()
+        field_names += ',date_created'
+        field_binds += ',?'
+        field_values.append(Generic.get_current_date())
+
         self.__connect()
         self.__cursor.execute(f"""
         INSERT INTO {self.__tb_cars}
-        (make, model, date_created)
-        VALUES (?,?,?)
-        """, (new_car.make, new_car.model, new_car.date_created))
+        ({field_names})
+        VALUES ({field_binds})
+        """, tuple(field_values))
+        new_id = self.__cursor.lastrowid
         self.__commit()
         self.__close_conn()
+        return new_id
 
     """
     ===============================================================================================

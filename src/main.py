@@ -1,43 +1,14 @@
-from fastapi import FastAPI, HTTPException
+from fastapi import FastAPI, Response, HTTPException, status
 # from fastapi.responses import JSONResponse
-from pydantic import BaseModel
 from database.car_db import CarDb
-
-
-class Car(BaseModel):
-    id: int
-    make: str
-    model: str
-    color: str | None = None
-    year_manufactured: int | None = None
-    year_model: int | None = None
-    fuel: str | None = None
-    horsepower: int | None = None
-    doors: int | None = None
-    seats: int | None = None
-    fipe: str | None = None
-    date_created: int
-    date_updated: int | None = None
-
-
-class CarPost(BaseModel):
-    make: str
-    model: str
-    color: str | None = None
-    year_manufactured: int | None = None
-    year_model: int | None = None
-    fuel: str | None = None
-    horsepower: int | None = None
-    doors: int | None = None
-    seats: int | None = None
-    fipe: str | None = None
+from model.car_basemodel import Car, CarPost
 
 
 app = FastAPI()
 
 
 @app.get('/cars')
-async def get_cars() -> list[Car]:
+async def get_all_cars() -> list[Car]:
     db = CarDb()
     items = []
     for car in db.select_all_cars():
@@ -46,7 +17,7 @@ async def get_cars() -> list[Car]:
 
 
 @app.get('/car/{car_id}')
-async def get_cars(car_id: int) -> Car:
+async def get_car(car_id: int) -> Car:
     db = CarDb()
     c = db.select_car_by_id(car_id=car_id)
     if c is None:
@@ -54,9 +25,14 @@ async def get_cars(car_id: int) -> Car:
     return Car(**c.__dict__)
 
 
-@app.post("/car")
-async def create_car(car: CarPost):
-    return car
+@app.post('/car')
+async def create_car(car: CarPost, response: Response):
+    db = CarDb()
+    id = db.insert_car(new_car=car)
+    resp = {'id': id}
+    resp.update(car)
+    response.status_code = status.HTTP_201_CREATED
+    return resp
 
 # put
 

@@ -1,7 +1,8 @@
 import argparse
 import sys
 from database.car_db import CarDb
-from model.car import Car
+# from model.car import Car
+from model.car_basemodel import CarPost
 
 
 if __name__ == '__main__':
@@ -26,9 +27,19 @@ if __name__ == '__main__':
     # db.list_columns_from_table(table_name='tb_cars', debug=True)
 
     # cars
-    # db.delete_all_cars()
+    db.delete_all_cars()
+    db.insert_car(CarPost(make='Volks',
+                          model='T-Cross',
+                          color='Cinza',
+                          year_manufactured=2019,
+                          year_model=2020,
+                          fuel='Flex',
+                          horsepower=150,
+                          doors=5,
+                          seats=5,
+                          fipe='brum'))
     # db.insert_car(Car(make='Volks', model='T-Cross'))
-    # db.insert_car(Car(make='Volks', model='Taos'))
+    db.insert_car(CarPost(make='Volks', model='Taos'))
     # db.insert_car(Car(make='Volks', model='Nivus'))
     ret = db.select_all_cars(debug=True)
     # print(ret)
