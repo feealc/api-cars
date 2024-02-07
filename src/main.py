@@ -1,7 +1,7 @@
 from fastapi import FastAPI, Response, HTTPException, status
 # from fastapi.responses import JSONResponse
 from database.car_db import CarDb
-from model.car_basemodel import Car, CarPost
+from model.car_basemodel import Car, CarPost, CarPut
 
 
 app = FastAPI()
@@ -21,7 +21,7 @@ async def get_car(car_id: int) -> Car:
     db = CarDb()
     c = db.select_car_by_id(car_id=car_id)
     if c is None:
-        raise HTTPException(status_code=404, detail="Car not found")
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Car not found")
     return Car(**c.__dict__)
 
 
@@ -34,7 +34,16 @@ async def create_car(car: CarPost, response: Response):
     response.status_code = status.HTTP_201_CREATED
     return resp
 
-# put
+
+@app.put('/car')
+async def update_car(car: CarPut):
+    db = CarDb()
+    c = db.select_car_by_id(car_id=car.id)
+    if c is None:
+        raise HTTPException(status_code=404, detail="Car not found")
+    db.update_car_put(car=car)
+    c = db.select_car_by_id(car_id=car.id)
+    return Car(**c.__dict__)
 
 # patch
 
