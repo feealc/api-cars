@@ -26,17 +26,16 @@ async def get_car(car_id: int) -> Car:
 
 
 @app.post('/car')
-async def create_car(car: CarPost, response: Response):
+async def create_car(car: CarPost, response: Response) -> Car:
     db = CarDb()
-    id = db.insert_car(new_car=car)
-    resp = {'id': id}
-    resp.update(car)
+    car_id = db.insert_car(new_car=car)
+    c = db.select_car_by_id(car_id=car_id)
     response.status_code = status.HTTP_201_CREATED
-    return resp
+    return Car(**c.__dict__)
 
 
 @app.put('/car')
-async def update_car(car: CarPut):
+async def update_car(car: CarPut) -> Car:
     db = CarDb()
     c = db.select_car_by_id(car_id=car.id)
     if c is None:
