@@ -5,6 +5,17 @@ from database.car_db import CarDb
 from model.car_basemodel import CarPost
 
 
+def prepare_for_test():
+    db = CarDb()
+    db.prepare()
+
+    db.delete_all_cars()
+    db.insert_car(CarPost(make='Volks', model='T-Cross', color='Cinza',
+                          year_manufactured=2019, year_model=2020,
+                          fuel='Flex', horsepower=150, doors=4, seats=5, fipe='brum')
+                  )
+
+
 if __name__ == '__main__':
     # parser = argparse.ArgumentParser()
     # parser.add_argument('-e', '--email', action='store_true', help='Não realizar envio do e-mail com os resultados')
@@ -38,8 +49,8 @@ if __name__ == '__main__':
                           doors=5,
                           seats=5,
                           fipe='brum'))
-    # db.insert_car(Car(make='Volks', model='T-Cross'))
     db.insert_car(CarPost(make='Volks', model='Taos'))
-    # db.insert_car(Car(make='Volks', model='Nivus'))
+    db.insert_car(CarPost(make='Mercedes', model='Sprinter'))
+    db.insert_car(CarPost(make='Hyundai', model='HB20'))
     ret = db.select_all_cars(debug=True)
     # print(ret)
