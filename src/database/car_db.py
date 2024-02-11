@@ -3,7 +3,7 @@ import os
 from pathlib import Path
 from gen.generic import Generic
 from model.car import Car
-from model.car_basemodel import CarPost, CarPut
+from model.car_basemodel import CarPost, CarPut, CarPatch
 
 
 class CarDb:
@@ -164,6 +164,20 @@ class CarDb:
     """
     def update_car_put(self, car: CarPut):
         field_names, field_binds, field_values = car.get_field_names(update=True, ignore_id=True)
+        field_names += ',date_updated = ?'
+        field_values.append(Generic.get_current_date())
+
+        self.__connect()
+        self.__cursor.execute(f"""
+        UPDATE {self.__tb_cars} SET
+        {field_names}
+        WHERE id = {car.id}
+        """, tuple(field_values))
+        self.__commit()
+        self.__close_conn()
+
+    def update_car_patch(self, car: CarPatch):
+        field_names, field_binds, field_values = car.get_field_names(update=True, ignore_id=True, ignore_value_none=True)
         field_names += ',date_updated = ?'
         field_values.append(Generic.get_current_date())
 
