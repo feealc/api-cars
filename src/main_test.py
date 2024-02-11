@@ -839,6 +839,321 @@ class MyTest(unittest.TestCase):
         self.assertIsInstance(resp_json, dict)
         self.assert_dict(source=resp_json, expected=resp_obj)
 
+    def test_5_patch(self):
+        update_car = {
+            'id': 1,
+            'fipe': 'Zombicide'
+        }
+        url = f'{self.base_url}/car'
+        resp = requests.patch(url, json=update_car)
+        resp_json = resp.json()
+        # print(resp_json)
+
+        self.assertEqual(resp.status_code, status.HTTP_200_OK)
+        new_car = self.car_expected
+        new_car.update(update_car)
+        new_car.update({
+            'date_updated': self.get_current_date_int()
+        })
+        self.assertIsInstance(resp_json, dict)
+        self.assert_dict(source=resp_json, expected=new_car)
+
+    def test_5_patch_id_wrong_type(self):
+        update_car = {
+            'id': 'x',
+        }
+        url = f'{self.base_url}/car'
+        resp = requests.patch(url, json=update_car)
+        resp_json = resp.json()
+
+        self.assertEqual(resp.status_code, status.HTTP_422_UNPROCESSABLE_ENTITY)
+        resp_obj = {
+            'detail': [
+                {
+                    'type': 'int_parsing',
+                    'loc': [
+                        'body',
+                        'id'
+                    ],
+                    'msg': 'Input should be a valid integer, unable to parse string as an integer',
+                    'input': 'x',
+                    'url': 'https://errors.pydantic.dev/2.6/v/int_parsing'
+                }
+            ]
+        }
+        self.assertIsInstance(resp_json, dict)
+        self.assert_dict(source=resp_json, expected=resp_obj)
+
+    def test_5_patch_make_wrong_type(self):
+        update_car = {
+            'id': 2,
+            'make': 412,
+        }
+        url = f'{self.base_url}/car'
+        resp = requests.patch(url, json=update_car)
+        resp_json = resp.json()
+
+        self.assertEqual(resp.status_code, status.HTTP_422_UNPROCESSABLE_ENTITY)
+        resp_obj = {
+            'detail': [
+                {
+                    'type': 'string_type',
+                    'loc': [
+                        'body',
+                        'make'
+                    ],
+                    'msg': 'Input should be a valid string',
+                    'input': 412,
+                    'url': 'https://errors.pydantic.dev/2.6/v/string_type'
+                }
+            ]
+        }
+        self.assertIsInstance(resp_json, dict)
+        self.assert_dict(source=resp_json, expected=resp_obj)
+
+    def test_5_patch_model_wrong_type(self):
+        update_car = {
+            'id': 2,
+            'model': 9
+        }
+        url = f'{self.base_url}/car'
+        resp = requests.patch(url, json=update_car)
+        resp_json = resp.json()
+
+        self.assertEqual(resp.status_code, status.HTTP_422_UNPROCESSABLE_ENTITY)
+        resp_obj = {
+            'detail': [
+                {
+                    'type': 'string_type',
+                    'loc': [
+                        'body',
+                        'model'
+                    ],
+                    'msg': 'Input should be a valid string',
+                    'input': 9,
+                    'url': 'https://errors.pydantic.dev/2.6/v/string_type'
+                }
+            ]
+        }
+        self.assertIsInstance(resp_json, dict)
+        self.assert_dict(source=resp_json, expected=resp_obj)
+
+    def test_5_patch_color_wrong_type(self):
+        update_car = {
+            'id': 2,
+            'color': 1234
+        }
+        url = f'{self.base_url}/car'
+        resp = requests.patch(url, json=update_car)
+        resp_json = resp.json()
+
+        self.assertEqual(resp.status_code, status.HTTP_422_UNPROCESSABLE_ENTITY)
+        resp_obj = {
+            'detail': [
+                {
+                    'type': 'string_type',
+                    'loc': [
+                        'body',
+                        'color'
+                    ],
+                    'msg': 'Input should be a valid string',
+                    'input': 1234,
+                    'url': 'https://errors.pydantic.dev/2.6/v/string_type'
+                }
+            ]
+        }
+        self.assertIsInstance(resp_json, dict)
+        self.assert_dict(source=resp_json, expected=resp_obj)
+
+    def test_5_patch_year_manufactured_wrong_type(self):
+        update_car = {
+            'id': 2,
+            'year_manufactured': 'b'
+        }
+        url = f'{self.base_url}/car'
+        resp = requests.patch(url, json=update_car)
+        resp_json = resp.json()
+
+        self.assertEqual(resp.status_code, status.HTTP_422_UNPROCESSABLE_ENTITY)
+        resp_obj = {
+            'detail': [
+                {
+                    'type': 'int_parsing',
+                    'loc': [
+                        'body',
+                        'year_manufactured'
+                    ],
+                    'msg': 'Input should be a valid integer, unable to parse string as an integer',
+                    'input': 'b',
+                    'url': 'https://errors.pydantic.dev/2.6/v/int_parsing'
+                }
+            ]
+        }
+        self.assertIsInstance(resp_json, dict)
+        self.assert_dict(source=resp_json, expected=resp_obj)
+
+    def test_5_patch_year_model_wrong_type(self):
+        update_car = {
+            'id': 2,
+            'year_model': 'c'
+        }
+        url = f'{self.base_url}/car'
+        resp = requests.patch(url, json=update_car)
+        resp_json = resp.json()
+
+        self.assertEqual(resp.status_code, status.HTTP_422_UNPROCESSABLE_ENTITY)
+        resp_obj = {
+            'detail': [
+                {
+                    'type': 'int_parsing',
+                    'loc': [
+                        'body',
+                        'year_model'
+                    ],
+                    'msg': 'Input should be a valid integer, unable to parse string as an integer',
+                    'input': 'c',
+                    'url': 'https://errors.pydantic.dev/2.6/v/int_parsing'
+                }
+            ]
+        }
+        self.assertIsInstance(resp_json, dict)
+        self.assert_dict(source=resp_json, expected=resp_obj)
+
+    def test_5_patch_fuel_wrong_type(self):
+        update_car = {
+            'id': 2,
+            'fuel': 4879
+        }
+        url = f'{self.base_url}/car'
+        resp = requests.patch(url, json=update_car)
+        resp_json = resp.json()
+
+        self.assertEqual(resp.status_code, status.HTTP_422_UNPROCESSABLE_ENTITY)
+        resp_obj = {
+            'detail': [
+                {
+                    'type': 'string_type',
+                    'loc': [
+                        'body',
+                        'fuel'
+                    ],
+                    'msg': 'Input should be a valid string',
+                    'input': 4879,
+                    'url': 'https://errors.pydantic.dev/2.6/v/string_type'
+                }
+            ]
+        }
+        self.assertIsInstance(resp_json, dict)
+        self.assert_dict(source=resp_json, expected=resp_obj)
+
+    def test_5_patch_horsepower_wrong_type(self):
+        update_car = {
+            'id': 2,
+            'horsepower': 'd'
+        }
+        url = f'{self.base_url}/car'
+        resp = requests.patch(url, json=update_car)
+        resp_json = resp.json()
+
+        self.assertEqual(resp.status_code, status.HTTP_422_UNPROCESSABLE_ENTITY)
+        resp_obj = {
+            'detail': [
+                {
+                    'type': 'int_parsing',
+                    'loc': [
+                        'body',
+                        'horsepower'
+                    ],
+                    'msg': 'Input should be a valid integer, unable to parse string as an integer',
+                    'input': 'd',
+                    'url': 'https://errors.pydantic.dev/2.6/v/int_parsing'
+                }
+            ]
+        }
+        self.assertIsInstance(resp_json, dict)
+        self.assert_dict(source=resp_json, expected=resp_obj)
+
+    def test_5_patch_doors_wrong_type(self):
+        update_car = {
+            'id': 2,
+            'doors': 'e'
+        }
+        url = f'{self.base_url}/car'
+        resp = requests.patch(url, json=update_car)
+        resp_json = resp.json()
+
+        self.assertEqual(resp.status_code, status.HTTP_422_UNPROCESSABLE_ENTITY)
+        resp_obj = {
+            'detail': [
+                {
+                    'type': 'int_parsing',
+                    'loc': [
+                        'body',
+                        'doors'
+                    ],
+                    'msg': 'Input should be a valid integer, unable to parse string as an integer',
+                    'input': 'e',
+                    'url': 'https://errors.pydantic.dev/2.6/v/int_parsing'
+                }
+            ]
+        }
+        self.assertIsInstance(resp_json, dict)
+        self.assert_dict(source=resp_json, expected=resp_obj)
+
+    def test_5_patch_seats_wrong_type(self):
+        update_car = {
+            'id': 2,
+            'seats': 'f'
+        }
+        url = f'{self.base_url}/car'
+        resp = requests.patch(url, json=update_car)
+        resp_json = resp.json()
+
+        self.assertEqual(resp.status_code, status.HTTP_422_UNPROCESSABLE_ENTITY)
+        resp_obj = {
+            'detail': [
+                {
+                    'type': 'int_parsing',
+                    'loc': [
+                        'body',
+                        'seats'
+                    ],
+                    'msg': 'Input should be a valid integer, unable to parse string as an integer',
+                    'input': 'f',
+                    'url': 'https://errors.pydantic.dev/2.6/v/int_parsing'
+                }
+            ]
+        }
+        self.assertIsInstance(resp_json, dict)
+        self.assert_dict(source=resp_json, expected=resp_obj)
+
+    def test_5_patch_fipe_wrong_type(self):
+        update_car = {
+            'id': 2,
+            'fipe': 9876
+        }
+        url = f'{self.base_url}/car'
+        resp = requests.patch(url, json=update_car)
+        resp_json = resp.json()
+
+        self.assertEqual(resp.status_code, status.HTTP_422_UNPROCESSABLE_ENTITY)
+        resp_obj = {
+            'detail': [
+                {
+                    'type': 'string_type',
+                    'loc': [
+                        'body',
+                        'fipe'
+                    ],
+                    'msg': 'Input should be a valid string',
+                    'input': 9876,
+                    'url': 'https://errors.pydantic.dev/2.6/v/string_type'
+                }
+            ]
+        }
+        self.assertIsInstance(resp_json, dict)
+        self.assert_dict(source=resp_json, expected=resp_obj)
+
 
 if __name__ == '__main__':
     # unittest.main(failfast=True, exit=True)

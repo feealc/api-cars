@@ -1,10 +1,15 @@
 from fastapi import FastAPI, Response, HTTPException, status
 # from fastapi.responses import JSONResponse
 from database.car_db import CarDb
-from model.car_basemodel import Car, CarPost, CarPut
+from model.car_basemodel import Car, CarPost, CarPut, CarPatch
+from pydantic import BaseModel
 
 
 app = FastAPI()
+
+
+class Message(BaseModel):
+    detail: str
 
 
 @app.get('/cars')
@@ -16,7 +21,7 @@ async def get_all_cars() -> list[Car]:
     return items
 
 
-@app.get('/car/{car_id}')
+@app.get('/car/{car_id}', responses={status.HTTP_404_NOT_FOUND: {'model': Message}})
 async def get_car(car_id: int) -> Car:
     db = CarDb()
     c = db.select_car_by_id(car_id=car_id)
@@ -34,17 +39,30 @@ async def create_car(car: CarPost, response: Response) -> Car:
     return Car(**c.__dict__)
 
 
-@app.put('/car')
+@app.put('/car', responses={status.HTTP_404_NOT_FOUND: {'model': Message}})
 async def update_car(car: CarPut) -> Car:
     db = CarDb()
     c = db.select_car_by_id(car_id=car.id)
     if c is None:
-        raise HTTPException(status_code=404, detail="Car not found")
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Car not found")
     db.update_car_put(car=car)
     c = db.select_car_by_id(car_id=car.id)
     return Car(**c.__dict__)
 
-# patch
+
+@app.patch('/car', responses={status.HTTP_404_NOT_FOUND: {'model': Message}})
+async def update_car(car: CarPatch) -> Car:
+    db = CarDb()
+    _, _, xxx = car.get_field_names(ignore_id=True, ignore_value_none=True)
+    if len(xxx) == 0:
+        raise HTTPException(status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+                            detail='Body must have at least one field other than id')
+    c = db.select_car_by_id(car_id=car.id)
+    if c is None:
+        raise HTTPException(status_code=404, detail="Car not found")
+    db.update_car_patch(car=car)
+    c = db.select_car_by_id(car_id=car.id)
+    return Car(**c.__dict__)
 
 # delete
 
