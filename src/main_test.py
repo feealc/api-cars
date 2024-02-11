@@ -1154,6 +1154,25 @@ class MyTest(unittest.TestCase):
         self.assertIsInstance(resp_json, dict)
         self.assert_dict(source=resp_json, expected=resp_obj)
 
+    def test_6_delete_car(self):
+        url = f'{self.base_url}/car/2'
+        resp = requests.delete(url)
+        resp_json = resp.json()
+        # print(resp_json)
+
+        self.assertEqual(resp.status_code, status.HTTP_200_OK)
+        self.assertIsInstance(resp_json, dict)
+        self.assert_dict(source=resp_json, expected={'detail': 'Car deleted'})
+
+    def test_6_delete_car_not_found(self):
+        url = f'{self.base_url}/car/2345'
+        resp = requests.delete(url)
+        resp_json = resp.json()
+
+        self.assertEqual(resp.status_code, status.HTTP_404_NOT_FOUND)
+        self.assertIsInstance(resp_json, dict)
+        self.assert_dict(source=resp_json, expected={'detail': 'Car not found'})
+
 
 if __name__ == '__main__':
     # unittest.main(failfast=True, exit=True)

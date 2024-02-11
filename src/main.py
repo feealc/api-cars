@@ -64,20 +64,15 @@ async def update_car(car: CarPatch) -> Car:
     c = db.select_car_by_id(car_id=car.id)
     return Car(**c.__dict__)
 
-# delete
 
-# @app.put("/items/{item_id}")
-# async def create_item(item_id: int, item: Item):
-#     return {"item_id": item_id, **item.dict()}
-
-
-# Because path operations are evaluated in order,
-# you need to make sure that the path for /users/me is declared before the one for /users/{user_id}:
-# @app.get('/users/me')
-# async def read_user_me():
-#     return {'user_id': 'the current user'}
-
-
-# @app.get('/users/{user_id}')
-# async def read_user(user_id: str):
-#     return {'user_id': user_id}
+@app.delete('/car/{car_id}', responses={
+    status.HTTP_200_OK: {'model': Message},
+    status.HTTP_404_NOT_FOUND: {'model': Message}
+})
+async def delete_car(car_id: int) -> dict:
+    db = CarDb()
+    c = db.select_car_by_id(car_id=car_id)
+    if c is None:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Car not found")
+    db.delete_car_by_id(car_id=car_id)
+    return {'detail': 'Car deleted'}

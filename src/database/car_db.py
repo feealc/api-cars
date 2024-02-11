@@ -142,7 +142,7 @@ class CarDb:
         self.__close_conn()
         return lines_ret
 
-    def select_car_by_id(self, car_id: int, debug: bool = False) -> Car:
+    def select_car_by_id(self, car_id: int, debug: bool = False) -> Car | None:
         self.__connect()
         self.__cursor.execute(f"""
         SELECT * FROM {self.__tb_cars} WHERE id = {car_id};
@@ -199,6 +199,16 @@ class CarDb:
         self.__connect()
         self.__cursor.execute(f"""
         DELETE FROM {self.__tb_cars};
+        """)
+        self.__commit()
+        self.__close_conn()
+        self.reset_auto_increment_cars()
+
+    def delete_car_by_id(self, car_id: int):
+        self.__connect()
+        self.__cursor.execute(f"""
+        DELETE FROM {self.__tb_cars}
+        WHERE id = {car_id};
         """)
         self.__commit()
         self.__close_conn()
