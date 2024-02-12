@@ -1,7 +1,7 @@
 from fastapi import FastAPI, Response, HTTPException, status
 # from fastapi.responses import JSONResponse
-from database.car_db import CarDb
-from model.car_basemodel import Car, CarPost, CarPut, CarPatch
+from src.database.car_db import CarDb
+from src.model.car_basemodel import Car, CarPost, CarPut, CarPatch
 from pydantic import BaseModel
 
 

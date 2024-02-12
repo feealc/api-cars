@@ -1,4 +1,4 @@
-from gen.generic import Generic
+from src.gen.generic import Generic
 
 
 class Car:
