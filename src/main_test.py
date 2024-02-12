@@ -848,7 +848,6 @@ class MyTest(unittest.TestCase):
         url = f'{self.base_url}/car'
         resp = requests.patch(url, json=update_car)
         resp_json = resp.json()
-        # print(resp_json)
 
         self.assertEqual(resp.status_code, status.HTTP_200_OK)
         new_car = self.car_expected
@@ -858,6 +857,41 @@ class MyTest(unittest.TestCase):
         })
         self.assertIsInstance(resp_json, dict)
         self.assert_dict(source=resp_json, expected=new_car)
+
+    def test_5_patch_id_only(self):
+        update_car = {
+            'id': 1
+        }
+        url = f'{self.base_url}/car'
+        resp = requests.patch(url, json=update_car)
+        resp_json = resp.json()
+
+        self.assertEqual(resp.status_code, status.HTTP_422_UNPROCESSABLE_ENTITY)
+        self.assertIsInstance(resp_json, dict)
+        self.assert_dict(source=resp_json, expected={'detail': 'Body must have at least one field other than id'})
+
+    def test_5_patch_id_missing(self):
+        url = f'{self.base_url}/car'
+        resp = requests.patch(url, json={})
+        resp_json = resp.json()
+
+        self.assertEqual(resp.status_code, status.HTTP_422_UNPROCESSABLE_ENTITY)
+        resp_obj = {
+            'detail': [
+                {
+                    'type': 'missing',
+                    'loc': [
+                        'body',
+                        'id'
+                    ],
+                    'msg': 'Field required',
+                    'input': {},
+                    'url': 'https://errors.pydantic.dev/2.6/v/missing'
+                }
+            ]
+        }
+        self.assertIsInstance(resp_json, dict)
+        self.assert_dict(source=resp_json, expected=resp_obj)
 
     def test_5_patch_id_wrong_type(self):
         update_car = {
