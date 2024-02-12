@@ -1,6 +1,7 @@
 from fastapi import FastAPI, Response, HTTPException, status
 # from fastapi.responses import JSONResponse
 from src.database.car_db import CarDb
+from src.gen.generic import ReturnMessage
 from src.model.car_basemodel import Car, CarPost, CarPut, CarPatch
 from pydantic import BaseModel
 
@@ -26,7 +27,7 @@ async def get_car(car_id: int) -> Car:
     db = CarDb()
     c = db.select_car_by_id(car_id=car_id)
     if c is None:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Car not found")
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=ReturnMessage.CAR_NOT_FOUND.value)
     return Car(**c.__dict__)
 
 
@@ -44,7 +45,7 @@ async def update_car(car: CarPut) -> Car:
     db = CarDb()
     c = db.select_car_by_id(car_id=car.id)
     if c is None:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Car not found")
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=ReturnMessage.CAR_NOT_FOUND.value)
     db.update_car_put(car=car)
     c = db.select_car_by_id(car_id=car.id)
     return Car(**c.__dict__)
@@ -53,13 +54,13 @@ async def update_car(car: CarPut) -> Car:
 @app.patch('/car', responses={status.HTTP_404_NOT_FOUND: {'model': Message}})
 async def update_car(car: CarPatch) -> Car:
     db = CarDb()
-    _, _, xxx = car.get_field_names(ignore_id=True, ignore_value_none=True)
-    if len(xxx) == 0:
+    _, _, aux = car.get_field_names(ignore_id=True, ignore_value_none=True)
+    if len(aux) == 0:
         raise HTTPException(status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
-                            detail='Body must have at least one field other than id')
+                            detail=ReturnMessage.BODY_MORE_THAN_ID)
     c = db.select_car_by_id(car_id=car.id)
     if c is None:
-        raise HTTPException(status_code=404, detail="Car not found")
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=ReturnMessage.CAR_NOT_FOUND.value)
     db.update_car_patch(car=car)
     c = db.select_car_by_id(car_id=car.id)
     return Car(**c.__dict__)
@@ -73,6 +74,13 @@ async def delete_car(car_id: int) -> dict:
     db = CarDb()
     c = db.select_car_by_id(car_id=car_id)
     if c is None:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Car not found")
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=ReturnMessage.CAR_NOT_FOUND.value)
     db.delete_car_by_id(car_id=car_id)
-    return {'detail': 'Car deleted'}
+    return {'detail': ReturnMessage.CAR_DELETED.value}
+
+
+@app.post('/reset', include_in_schema=False, responses={status.HTTP_200_OK: {'model': Message}})
+async def reset():
+    db = CarDb()
+    db.delete_all_cars()
+    return {'detail': ReturnMessage.RESET_COMPLETED.value}
