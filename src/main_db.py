@@ -1,8 +1,8 @@
-import argparse
-import sys
-from database.car_db import CarDb
-# from model.car import Car
-from model.car_basemodel import CarPost
+# import argparse
+# import sys
+from src.database.car_db import CarDb
+# from src.model.car import Car
+from src.model.car_basemodel import CarPost
 
 
 def prepare_for_test():

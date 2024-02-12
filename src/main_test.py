@@ -1,6 +1,6 @@
 from datetime import datetime
 from fastapi import status
-from main_db import prepare_for_test
+from src.main_db import prepare_for_test
 # from model.car import Car
 # from typing import Any
 import requests
@@ -16,6 +16,7 @@ class MyTest(unittest.TestCase):
     def setUpClass(cls):
         prepare_for_test()
         cls.base_url = 'http://127.0.0.1:8000'
+        # cls.base_url = 'http://0.0.0.0:8080'
         cls.car_expected = {
             'id': 1,
             'make': 'Volks',
@@ -1158,7 +1159,6 @@ class MyTest(unittest.TestCase):
         url = f'{self.base_url}/car/2'
         resp = requests.delete(url)
         resp_json = resp.json()
-        # print(resp_json)
 
         self.assertEqual(resp.status_code, status.HTTP_200_OK)
         self.assertIsInstance(resp_json, dict)

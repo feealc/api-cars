@@ -1,9 +1,9 @@
 import sqlite3
 import os
 from pathlib import Path
-from gen.generic import Generic
-from model.car import Car
-from model.car_basemodel import CarPost, CarPut, CarPatch
+from src.gen.generic import Generic
+from src.model.car import Car
+from src.model.car_basemodel import CarPost, CarPut, CarPatch
 
 
 class CarDb:
