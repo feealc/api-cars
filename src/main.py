@@ -75,7 +75,6 @@ async def update_car(car: CarPatch) -> Car:
     if c is None:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=ReturnMessage.CAR_NOT_FOUND.value)
     if db.check_car_exist(make=car.make, model=car.model):
-        print('raise 400')
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=ReturnMessage.CAR_EXIST.value)
     db.update_car_patch(car=car)
     c = db.select_car_by_id(car_id=car.id)

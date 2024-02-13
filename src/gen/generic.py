@@ -7,10 +7,14 @@ import unittest
 class Detail(StrEnum):
     MISSING = 'missing'
     STRING_TYPE = 'string_type'
+    STRING_TOO_SHORT = 'string_too_short'
+    GREATER_THAN = 'greater_than'
     INT_PARSING = 'int_parsing'
     FIELD_REQUIRED = 'Field required'
     INPUT_VALID_STRING = 'Input should be a valid string'
+    INPUT_VALID_STRING_MIN_LENGTH = 'String should have at least 1 character'
     INPUT_VALID_INTEGER = 'Input should be a valid integer, unable to parse string as an integer'
+    INPUT_VALID_INTEGER_GREATER_THAN = 'Input should be greater than 0'
 
 
 class ReturnMessage(StrEnum):
@@ -89,18 +93,30 @@ class Generic:
     def get_detail_info(type_field: Detail,
                         field: str,
                         msg: Detail,
-                        input_data: dict | str | int) -> dict:
-        return {
+                        input_data: dict | str | int,
+                        min_length: int | None = None,
+                        gt: int | None = None
+                        ) -> dict:
+        obj = {
+            'type': type_field.value,
+            'loc': [
+                'body',
+                field
+            ],
+            'msg': msg.value,
+            'input': input_data,
+            'url': f'https://errors.pydantic.dev/2.6/v/{type_field.value}'
+        }
+
+        if min_length is not None:
+            obj.update({'ctx': {'min_length': min_length}})
+        if gt is not None:
+            obj.update({'ctx': {'gt': gt}})
+
+        detail_obj = {
             'detail': [
-                {
-                    'type': type_field.value,
-                    'loc': [
-                        'body',
-                        field
-                    ],
-                    'msg': msg.value,
-                    'input': input_data,
-                    'url': f'https://errors.pydantic.dev/2.6/v/{type_field.value}'
-                }
+                obj
             ]
         }
+
+        return detail_obj

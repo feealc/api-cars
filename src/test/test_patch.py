@@ -20,6 +20,7 @@ class TestPatch(unittest.TestCase):
     def test_patch(self):
         url = f'{self.base_url}/car'
         update_car = Generic.car_patch()
+        update_car['fipe'] = update_car['fipe'] + '         '
         resp = requests.patch(url, json=update_car)
         resp_json = resp.json()
 
@@ -32,6 +33,10 @@ class TestPatch(unittest.TestCase):
             'date_created': Generic.get_current_date(),
             'date_updated': Generic.get_current_date()
         })
+        update_car = {
+            # clear values with spaces
+            key: value.strip() if isinstance(value, str) else value for key, value in update_car.items()
+        }
         updated_car.update(update_car)
         self.assertIsInstance(resp_json, dict)
         Generic.assert_dict(source=resp_json, expected=updated_car)
@@ -85,6 +90,25 @@ class TestPatch(unittest.TestCase):
         self.assertIsInstance(resp_json, dict)
         Generic.assert_dict(source=resp_json, expected=resp_obj)
 
+    def test_patch_id_zero(self):
+        new_car = {
+            'id': 0,
+            'make': 'b',
+            'model': 'a'
+        }
+        url = f'{self.base_url}/car'
+        resp = requests.patch(url, json=new_car)
+        resp_json = resp.json()
+
+        self.assertEqual(resp.status_code, status.HTTP_422_UNPROCESSABLE_ENTITY)
+        resp_obj = Generic.get_detail_info(type_field=Detail.GREATER_THAN,
+                                           field='id',
+                                           msg=Detail.INPUT_VALID_INTEGER_GREATER_THAN,
+                                           input_data=0,
+                                           gt=0)
+        self.assertIsInstance(resp_json, dict)
+        Generic.assert_dict(source=resp_json, expected=resp_obj)
+
     def test_patch_make_model_equal(self):
         url = f'{self.base_url}/car'
         car_post = Generic.car_put()
@@ -123,6 +147,42 @@ class TestPatch(unittest.TestCase):
         self.assertIsInstance(resp_json, dict)
         Generic.assert_dict(source=resp_json, expected=resp_obj)
 
+    def test_patch_make_empty(self):
+        new_car = {
+            'id': 2,
+            'make': ''
+        }
+        url = f'{self.base_url}/car'
+        resp = requests.patch(url, json=new_car)
+        resp_json = resp.json()
+
+        self.assertEqual(resp.status_code, status.HTTP_422_UNPROCESSABLE_ENTITY)
+        resp_obj = Generic.get_detail_info(type_field=Detail.STRING_TOO_SHORT,
+                                           field='make',
+                                           msg=Detail.INPUT_VALID_STRING_MIN_LENGTH,
+                                           input_data='',
+                                           min_length=1)
+        self.assertIsInstance(resp_json, dict)
+        Generic.assert_dict(source=resp_json, expected=resp_obj)
+
+    def test_patch_make_spaces(self):
+        new_car = {
+            'id': 2,
+            'make': '    '
+        }
+        url = f'{self.base_url}/car'
+        resp = requests.patch(url, json=new_car)
+        resp_json = resp.json()
+
+        self.assertEqual(resp.status_code, status.HTTP_422_UNPROCESSABLE_ENTITY)
+        resp_obj = Generic.get_detail_info(type_field=Detail.STRING_TOO_SHORT,
+                                           field='make',
+                                           msg=Detail.INPUT_VALID_STRING_MIN_LENGTH,
+                                           input_data='    ',
+                                           min_length=1)
+        self.assertIsInstance(resp_json, dict)
+        Generic.assert_dict(source=resp_json, expected=resp_obj)
+
     def test_patch_model_equal(self):
         url = f'{self.base_url}/car'
         car_post = Generic.car_put()
@@ -151,6 +211,42 @@ class TestPatch(unittest.TestCase):
         self.assertIsInstance(resp_json, dict)
         Generic.assert_dict(source=resp_json, expected=resp_obj)
 
+    def test_patch_model_empty(self):
+        new_car = {
+            'id': 2,
+            'model': ''
+        }
+        url = f'{self.base_url}/car'
+        resp = requests.patch(url, json=new_car)
+        resp_json = resp.json()
+
+        self.assertEqual(resp.status_code, status.HTTP_422_UNPROCESSABLE_ENTITY)
+        resp_obj = Generic.get_detail_info(type_field=Detail.STRING_TOO_SHORT,
+                                           field='model',
+                                           msg=Detail.INPUT_VALID_STRING_MIN_LENGTH,
+                                           input_data='',
+                                           min_length=1)
+        self.assertIsInstance(resp_json, dict)
+        Generic.assert_dict(source=resp_json, expected=resp_obj)
+
+    def test_patch_model_spaces(self):
+        new_car = {
+            'id': 2,
+            'model': '   '
+        }
+        url = f'{self.base_url}/car'
+        resp = requests.patch(url, json=new_car)
+        resp_json = resp.json()
+
+        self.assertEqual(resp.status_code, status.HTTP_422_UNPROCESSABLE_ENTITY)
+        resp_obj = Generic.get_detail_info(type_field=Detail.STRING_TOO_SHORT,
+                                           field='model',
+                                           msg=Detail.INPUT_VALID_STRING_MIN_LENGTH,
+                                           input_data='   ',
+                                           min_length=1)
+        self.assertIsInstance(resp_json, dict)
+        Generic.assert_dict(source=resp_json, expected=resp_obj)
+
     def test_patch_color_wrong_type(self):
         update_car = {
             'id': 2,
@@ -165,6 +261,42 @@ class TestPatch(unittest.TestCase):
                                            field='color',
                                            msg=Detail.INPUT_VALID_STRING,
                                            input_data=1234)
+        self.assertIsInstance(resp_json, dict)
+        Generic.assert_dict(source=resp_json, expected=resp_obj)
+
+    def test_patch_color_empty(self):
+        new_car = {
+            'id': 2,
+            'color': ''
+        }
+        url = f'{self.base_url}/car'
+        resp = requests.patch(url, json=new_car)
+        resp_json = resp.json()
+
+        self.assertEqual(resp.status_code, status.HTTP_422_UNPROCESSABLE_ENTITY)
+        resp_obj = Generic.get_detail_info(type_field=Detail.STRING_TOO_SHORT,
+                                           field='color',
+                                           msg=Detail.INPUT_VALID_STRING_MIN_LENGTH,
+                                           input_data='',
+                                           min_length=1)
+        self.assertIsInstance(resp_json, dict)
+        Generic.assert_dict(source=resp_json, expected=resp_obj)
+
+    def test_patch_color_spaces(self):
+        new_car = {
+            'id': 2,
+            'color': '  '
+        }
+        url = f'{self.base_url}/car'
+        resp = requests.patch(url, json=new_car)
+        resp_json = resp.json()
+
+        self.assertEqual(resp.status_code, status.HTTP_422_UNPROCESSABLE_ENTITY)
+        resp_obj = Generic.get_detail_info(type_field=Detail.STRING_TOO_SHORT,
+                                           field='color',
+                                           msg=Detail.INPUT_VALID_STRING_MIN_LENGTH,
+                                           input_data='  ',
+                                           min_length=1)
         self.assertIsInstance(resp_json, dict)
         Generic.assert_dict(source=resp_json, expected=resp_obj)
 
@@ -185,6 +317,24 @@ class TestPatch(unittest.TestCase):
         self.assertIsInstance(resp_json, dict)
         Generic.assert_dict(source=resp_json, expected=resp_obj)
 
+    def test_patch_year_manufactured_zero(self):
+        new_car = {
+            'id': 2,
+            'year_manufactured': 0
+        }
+        url = f'{self.base_url}/car'
+        resp = requests.patch(url, json=new_car)
+        resp_json = resp.json()
+
+        self.assertEqual(resp.status_code, status.HTTP_422_UNPROCESSABLE_ENTITY)
+        resp_obj = Generic.get_detail_info(type_field=Detail.GREATER_THAN,
+                                           field='year_manufactured',
+                                           msg=Detail.INPUT_VALID_INTEGER_GREATER_THAN,
+                                           input_data=0,
+                                           gt=0)
+        self.assertIsInstance(resp_json, dict)
+        Generic.assert_dict(source=resp_json, expected=resp_obj)
+
     def test_patch_year_model_wrong_type(self):
         update_car = {
             'id': 2,
@@ -199,6 +349,24 @@ class TestPatch(unittest.TestCase):
                                            field='year_model',
                                            msg=Detail.INPUT_VALID_INTEGER,
                                            input_data='c')
+        self.assertIsInstance(resp_json, dict)
+        Generic.assert_dict(source=resp_json, expected=resp_obj)
+
+    def test_patch_year_model_zero(self):
+        new_car = {
+            'id': 2,
+            'year_model': 0
+        }
+        url = f'{self.base_url}/car'
+        resp = requests.patch(url, json=new_car)
+        resp_json = resp.json()
+
+        self.assertEqual(resp.status_code, status.HTTP_422_UNPROCESSABLE_ENTITY)
+        resp_obj = Generic.get_detail_info(type_field=Detail.GREATER_THAN,
+                                           field='year_model',
+                                           msg=Detail.INPUT_VALID_INTEGER_GREATER_THAN,
+                                           input_data=0,
+                                           gt=0)
         self.assertIsInstance(resp_json, dict)
         Generic.assert_dict(source=resp_json, expected=resp_obj)
 
@@ -219,6 +387,42 @@ class TestPatch(unittest.TestCase):
         self.assertIsInstance(resp_json, dict)
         Generic.assert_dict(source=resp_json, expected=resp_obj)
 
+    def test_patch_fuel_empty(self):
+        new_car = {
+            'id': 2,
+            'fuel': ''
+        }
+        url = f'{self.base_url}/car'
+        resp = requests.patch(url, json=new_car)
+        resp_json = resp.json()
+
+        self.assertEqual(resp.status_code, status.HTTP_422_UNPROCESSABLE_ENTITY)
+        resp_obj = Generic.get_detail_info(type_field=Detail.STRING_TOO_SHORT,
+                                           field='fuel',
+                                           msg=Detail.INPUT_VALID_STRING_MIN_LENGTH,
+                                           input_data='',
+                                           min_length=1)
+        self.assertIsInstance(resp_json, dict)
+        Generic.assert_dict(source=resp_json, expected=resp_obj)
+
+    def test_patch_fuel_spaces(self):
+        new_car = {
+            'id': 2,
+            'fuel': '  '
+        }
+        url = f'{self.base_url}/car'
+        resp = requests.patch(url, json=new_car)
+        resp_json = resp.json()
+
+        self.assertEqual(resp.status_code, status.HTTP_422_UNPROCESSABLE_ENTITY)
+        resp_obj = Generic.get_detail_info(type_field=Detail.STRING_TOO_SHORT,
+                                           field='fuel',
+                                           msg=Detail.INPUT_VALID_STRING_MIN_LENGTH,
+                                           input_data='  ',
+                                           min_length=1)
+        self.assertIsInstance(resp_json, dict)
+        Generic.assert_dict(source=resp_json, expected=resp_obj)
+
     def test_patch_horsepower_wrong_type(self):
         update_car = {
             'id': 2,
@@ -233,6 +437,24 @@ class TestPatch(unittest.TestCase):
                                            field='horsepower',
                                            msg=Detail.INPUT_VALID_INTEGER,
                                            input_data='d')
+        self.assertIsInstance(resp_json, dict)
+        Generic.assert_dict(source=resp_json, expected=resp_obj)
+
+    def test_patch_horsepower_zero(self):
+        new_car = {
+            'id': 2,
+            'horsepower': 0
+        }
+        url = f'{self.base_url}/car'
+        resp = requests.patch(url, json=new_car)
+        resp_json = resp.json()
+
+        self.assertEqual(resp.status_code, status.HTTP_422_UNPROCESSABLE_ENTITY)
+        resp_obj = Generic.get_detail_info(type_field=Detail.GREATER_THAN,
+                                           field='horsepower',
+                                           msg=Detail.INPUT_VALID_INTEGER_GREATER_THAN,
+                                           input_data=0,
+                                           gt=0)
         self.assertIsInstance(resp_json, dict)
         Generic.assert_dict(source=resp_json, expected=resp_obj)
 
@@ -253,6 +475,24 @@ class TestPatch(unittest.TestCase):
         self.assertIsInstance(resp_json, dict)
         Generic.assert_dict(source=resp_json, expected=resp_obj)
 
+    def test_patch_doors_zero(self):
+        new_car = {
+            'id': 2,
+            'doors': 0
+        }
+        url = f'{self.base_url}/car'
+        resp = requests.patch(url, json=new_car)
+        resp_json = resp.json()
+
+        self.assertEqual(resp.status_code, status.HTTP_422_UNPROCESSABLE_ENTITY)
+        resp_obj = Generic.get_detail_info(type_field=Detail.GREATER_THAN,
+                                           field='doors',
+                                           msg=Detail.INPUT_VALID_INTEGER_GREATER_THAN,
+                                           input_data=0,
+                                           gt=0)
+        self.assertIsInstance(resp_json, dict)
+        Generic.assert_dict(source=resp_json, expected=resp_obj)
+
     def test_patch_seats_wrong_type(self):
         update_car = {
             'id': 2,
@@ -270,6 +510,24 @@ class TestPatch(unittest.TestCase):
         self.assertIsInstance(resp_json, dict)
         Generic.assert_dict(source=resp_json, expected=resp_obj)
 
+    def test_patch_seats_zero(self):
+        new_car = {
+            'id': 2,
+            'seats': 0
+        }
+        url = f'{self.base_url}/car'
+        resp = requests.patch(url, json=new_car)
+        resp_json = resp.json()
+
+        self.assertEqual(resp.status_code, status.HTTP_422_UNPROCESSABLE_ENTITY)
+        resp_obj = Generic.get_detail_info(type_field=Detail.GREATER_THAN,
+                                           field='seats',
+                                           msg=Detail.INPUT_VALID_INTEGER_GREATER_THAN,
+                                           input_data=0,
+                                           gt=0)
+        self.assertIsInstance(resp_json, dict)
+        Generic.assert_dict(source=resp_json, expected=resp_obj)
+
     def test_patch_fipe_wrong_type(self):
         update_car = {
             'id': 2,
@@ -284,5 +542,41 @@ class TestPatch(unittest.TestCase):
                                            field='fipe',
                                            msg=Detail.INPUT_VALID_STRING,
                                            input_data=9876)
+        self.assertIsInstance(resp_json, dict)
+        Generic.assert_dict(source=resp_json, expected=resp_obj)
+
+    def test_patch_fipe_empty(self):
+        new_car = {
+            'id': 2,
+            'fipe': ''
+        }
+        url = f'{self.base_url}/car'
+        resp = requests.patch(url, json=new_car)
+        resp_json = resp.json()
+
+        self.assertEqual(resp.status_code, status.HTTP_422_UNPROCESSABLE_ENTITY)
+        resp_obj = Generic.get_detail_info(type_field=Detail.STRING_TOO_SHORT,
+                                           field='fipe',
+                                           msg=Detail.INPUT_VALID_STRING_MIN_LENGTH,
+                                           input_data='',
+                                           min_length=1)
+        self.assertIsInstance(resp_json, dict)
+        Generic.assert_dict(source=resp_json, expected=resp_obj)
+
+    def test_patch_fipe_spaces(self):
+        new_car = {
+            'id': 2,
+            'fipe': '   '
+        }
+        url = f'{self.base_url}/car'
+        resp = requests.patch(url, json=new_car)
+        resp_json = resp.json()
+
+        self.assertEqual(resp.status_code, status.HTTP_422_UNPROCESSABLE_ENTITY)
+        resp_obj = Generic.get_detail_info(type_field=Detail.STRING_TOO_SHORT,
+                                           field='fipe',
+                                           msg=Detail.INPUT_VALID_STRING_MIN_LENGTH,
+                                           input_data='   ',
+                                           min_length=1)
         self.assertIsInstance(resp_json, dict)
         Generic.assert_dict(source=resp_json, expected=resp_obj)
