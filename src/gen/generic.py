@@ -95,12 +95,13 @@ class Generic:
                         msg: Detail,
                         input_data: dict | str | int,
                         min_length: int | None = None,
-                        gt: int | None = None
+                        gt: int | None = None,
+                        loc: str = 'body'
                         ) -> dict:
         obj = {
             'type': type_field.value,
             'loc': [
-                'body',
+                loc,
                 field
             ],
             'msg': msg.value,
