@@ -3,7 +3,7 @@ import os
 import sys
 sys.path.append(os.path.join(Path(__file__).parent.parent.parent))
 from fastapi import status
-from src.gen.generic import Generic, ReturnMessage
+from src.gen.generic import Generic, Detail, ReturnMessage
 import requests
 import unittest
 
@@ -46,3 +46,17 @@ class TestGet(unittest.TestCase):
         self.assertEqual(resp.status_code, status.HTTP_404_NOT_FOUND)
         self.assertIsInstance(resp_json, dict)
         Generic.assert_dict(source=resp_json, expected={'detail': ReturnMessage.CAR_NOT_FOUND.value})
+
+    def test_get_car_wrong_type(self):
+        url = f'{self.base_url}/car/x'
+        resp = requests.get(url)
+        resp_json = resp.json()
+
+        self.assertEqual(resp.status_code, status.HTTP_422_UNPROCESSABLE_ENTITY)
+        self.assertIsInstance(resp_json, dict)
+        resp_obj = Generic.get_detail_info(type_field=Detail.INT_PARSING,
+                                           loc='path',
+                                           field='car_id',
+                                           msg=Detail.INPUT_VALID_INTEGER,
+                                           input_data='x')
+        Generic.assert_dict(source=resp_json, expected=resp_obj)
