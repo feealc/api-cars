@@ -18,6 +18,7 @@ class ReturnMessage(StrEnum):
     BODY_MORE_THAN_ID = 'Body must have at least one field other than id'
     CAR_DELETED = 'Car deleted'
     RESET_COMPLETED = 'Reset completed'
+    CAR_EXIST = 'Car already exist'
 
 
 class Generic:

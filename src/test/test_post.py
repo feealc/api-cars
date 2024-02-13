@@ -3,7 +3,7 @@ import os
 import sys
 sys.path.append(os.path.join(Path(__file__).parent.parent.parent))
 from fastapi import status
-from src.gen.generic import Generic, Detail
+from src.gen.generic import Generic, Detail, ReturnMessage
 import requests
 import unittest
 
@@ -27,6 +27,27 @@ class TestPost(unittest.TestCase):
         car_post = Generic.car_post_expected()
         self.assertIsInstance(resp_json, dict)
         Generic.assert_dict(source=resp_json, expected=car_post)
+
+    def test_post_make_model_equal(self):
+        url = f'{self.base_url}/car'
+        car_post = Generic.car_post()
+        resp = requests.post(url, json=car_post)
+        resp_json = resp.json()
+
+        self.assertEqual(resp.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertIsInstance(resp_json, dict)
+        Generic.assert_dict(source=resp_json, expected={'detail': ReturnMessage.CAR_EXIST.value})
+
+    def test_post_make_equal(self):
+        url = f'{self.base_url}/car'
+        car_post = Generic.car_post()
+        car_post.update({'model': 'brum'})
+        resp = requests.post(url, json=car_post)
+        resp_json = resp.json()
+
+        self.assertEqual(resp.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertIsInstance(resp_json, dict)
+        Generic.assert_dict(source=resp_json, expected={'detail': ReturnMessage.CAR_EXIST.value})
 
     def test_post_make_missing(self):
         new_car = {
@@ -60,6 +81,17 @@ class TestPost(unittest.TestCase):
                                            input_data=412)
         self.assertIsInstance(resp_json, dict)
         Generic.assert_dict(source=resp_json, expected=resp_obj)
+
+    def test_post_model_equal(self):
+        url = f'{self.base_url}/car'
+        car_post = Generic.car_post()
+        car_post.update({'make': 'brum'})
+        resp = requests.post(url, json=car_post)
+        resp_json = resp.json()
+
+        self.assertEqual(resp.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertIsInstance(resp_json, dict)
+        Generic.assert_dict(source=resp_json, expected={'detail': ReturnMessage.CAR_EXIST.value})
 
     def test_post_model_missing(self):
         new_car = {

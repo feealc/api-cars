@@ -85,6 +85,14 @@ class CarDb:
         self.__close_conn()
         return cols
 
+    def check_car_exist(self, make: str, model: str) -> bool:
+        for car in self.select_all_cars():
+            if ((make is not None and car.make.strip().upper() == make.strip().upper())
+                    or
+                    (model is not None and car.model.strip().upper() == model.strip().upper())):
+                return True
+        return False
+
     """
     ===============================================================================================
     INSERT
@@ -177,7 +185,8 @@ class CarDb:
         self.__close_conn()
 
     def update_car_patch(self, car: CarPatch):
-        field_names, field_binds, field_values = car.get_field_names(update=True, ignore_id=True, ignore_value_none=True)
+        field_names, field_binds, field_values = car.get_field_names(update=True, ignore_id=True,
+                                                                     ignore_value_none=True)
         field_names += ',date_updated = ?'
         field_values.append(Generic.get_current_date())
 
