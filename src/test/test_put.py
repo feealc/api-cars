@@ -63,6 +63,27 @@ class TestPut(unittest.TestCase):
         self.assertIsInstance(resp_json, dict)
         Generic.assert_dict(source=resp_json, expected=resp_obj)
 
+    def test_put_make_model_equal(self):
+        url = f'{self.base_url}/car'
+        car_post = Generic.car_put()
+        resp = requests.put(url, json=car_post)
+        resp_json = resp.json()
+
+        self.assertEqual(resp.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertIsInstance(resp_json, dict)
+        Generic.assert_dict(source=resp_json, expected={'detail': ReturnMessage.CAR_EXIST.value})
+
+    def test_put_make_equal(self):
+        url = f'{self.base_url}/car'
+        car_post = Generic.car_put()
+        car_post.update({'model': 'brum'})
+        resp = requests.put(url, json=car_post)
+        resp_json = resp.json()
+
+        self.assertEqual(resp.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertIsInstance(resp_json, dict)
+        Generic.assert_dict(source=resp_json, expected={'detail': ReturnMessage.CAR_EXIST.value})
+
     def test_put_make_missing(self):
         update_car = {
             'id': 1,
@@ -97,6 +118,17 @@ class TestPut(unittest.TestCase):
                                            input_data=412)
         self.assertIsInstance(resp_json, dict)
         Generic.assert_dict(source=resp_json, expected=resp_obj)
+
+    def test_put_model_equal(self):
+        url = f'{self.base_url}/car'
+        car_post = Generic.car_put()
+        car_post.update({'make': 'brum'})
+        resp = requests.put(url, json=car_post)
+        resp_json = resp.json()
+
+        self.assertEqual(resp.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertIsInstance(resp_json, dict)
+        Generic.assert_dict(source=resp_json, expected={'detail': ReturnMessage.CAR_EXIST.value})
 
     def test_put_model_missing(self):
         update_car = {
